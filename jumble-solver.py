@@ -7,13 +7,12 @@ import enchant
 tag = 'en_CA'
 dictionary = enchant.Dict(tag)
 
-def solveJumble(jumble):
+def solveJumble():
     if not enchant.dict_exists(tag):
         print('Error: dictionary not available.')
         return
 
-    totalOptions = [] # a collection of unique character arrangements
-    sortedWordList = {} # a dictionary that groups words together by character length in alphabetical order
+    jumble = input('Enter a word jumble: ')
 
     text = jumble.strip().lower()
     if not text.isalpha():
@@ -35,6 +34,8 @@ def solveJumble(jumble):
     
     chars = tuple(chars) # make immutable reference
     maxWordLength = len(chars)
+    totalOptions = [] # a collection of unique character arrangements
+    sortedWordList = {} # a dictionary that groups words together by character length in alphabetical order
 
     # set keys for sorted word list:
     for w in range(maxWordLength, 1, -1):
@@ -53,7 +54,7 @@ def solveJumble(jumble):
             copy = list(tupleChars)
             copy.pop(i)
 
-            # will be a list of lists with each sublist containing one string of length between 2 and maxLength:
+            # will be a list of lists with each sublist containing one string of length between 2 and maxWordLength:
             finalOptionSet = []
 
             def getNextChar(charList, opSet, remLength):
@@ -103,8 +104,8 @@ def solveJumble(jumble):
         wordLength = len(word)
         sortedWordList[wordLength].append(word)
     
+    print('Solutions:')
     print(sortedWordList)
     
 
-# Example to test function:
-solveJumble('tasting')
+solveJumble()

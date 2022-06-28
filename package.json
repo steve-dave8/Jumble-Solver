@@ -2,15 +2,17 @@
   "name": "jumble-solver",
   "version": "1.0.0",
   "description": "",
-  "main": "jumble-solver.js",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
-  "author": "",
+  "author": "Steven White",
   "license": "ISC",
-  "devDependencies": {
-    "node-fetch": "^3.2.6"
+  "main": "jumble-solver.js",
+  "dependencies": {
+    "browserify": "^17.0.0",
+    "check-word": "^1.1.0",
+    "prompt": "^1.3.0"
+  },
+  "scripts": {
+    "start": "node jumble-solver.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
