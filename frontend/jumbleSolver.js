@@ -43,11 +43,23 @@ const solveJumble = (chars) => {
         sortedWordList[`${i}`] = [];
     }
 
+    let uniqueCharSets = [];
+
     // recursive function to get all arrangements of a string and its substrings:
     const solveSubJumble = (arrayChars) => {
+        const charList = [...arrayChars];
+        charList.sort();
+        const unique = charList.join("");
+        // improve performance for jumbles with duplicate letters:
+        if (!uniqueCharSets.includes(unique)) {
+            uniqueCharSets.push(unique);
+        } else {
+            return;
+        }
+
         const length = arrayChars.length;
 
-        arrayChars.map((c, i) => {
+        arrayChars.forEach((c, i) => {
             let optionSet = [];
             const numOptions = factorial(length - 1);
 
@@ -76,18 +88,20 @@ const solveJumble = (chars) => {
                     for (let y = 0; y < nestedSet[x].length; y++) {
                         nestedSet[x][y] += charList[x];
                     }
-                }                  
-                
-                if (remLength > 1) {
-                    for (let x = 0; x < remLength; x++) {
+
+                    if (remLength > 1) {
                         let nestCopy = [...charList]; // make copy so as not to mutate the original list
                         nestCopy.splice(x, 1); // remove one character
                         getNextChar(nestCopy, nestedSet[x]); // repeat with reduced character list to get next character
                     }
-                } 
-                else {
-                    finalOptionSet.push(nestedSet[0][0]);
-                }
+                    else {
+                        const potentialWord = nestedSet[0][0];
+                        // English words typically do not consist of only consonants
+                        if (!potentialWord.match(/\b[^aeiouy]+\b/g)) {
+                            finalOptionSet.push(potentialWord);
+                        }
+                    }
+                }                  
             };
 
             getNextChar(copy, optionSet);

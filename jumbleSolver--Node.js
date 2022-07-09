@@ -1,5 +1,6 @@
 var checkWord = require('check-word');
 var prompt = require('prompt');
+// const { performance } = require('perf_hooks');
 
 const factorial = (num) => {
     let result = 1;
@@ -59,16 +60,30 @@ const solveJumble = async () => {
     let totalOptions = []; // an array of unique character arrangements
     let sortedWordList = {} // an object that groups words together by character length in alphabetical order
 
+    // const time1 = performance.now();
+
     // set keys for sorted word list:
     for (let i = maxWordLength; i > 1; i--) {
         sortedWordList[`${i}`] = [];
     }
 
+    let uniqueCharSets = [];
+
     // recursive function to get all arrangements of a string and its substrings:
     const solveSubJumble = (arrayChars) => {
+        const charList = [...arrayChars];
+        charList.sort();
+        const unique = charList.join("");   
+        // improve performance for jumbles with duplicate letters:
+        if (!uniqueCharSets.includes(unique)) {
+            uniqueCharSets.push(unique);
+        } else {
+            return;
+        }
+
         const length = arrayChars.length;
 
-        arrayChars.map((c, i) => {
+        arrayChars.forEach((c, i) => {
             let optionSet = [];
             const numOptions = factorial(length - 1);
 
@@ -97,17 +112,19 @@ const solveJumble = async () => {
                     for (let y = 0; y < nestedSet[x].length; y++) {
                         nestedSet[x][y] += charList[x];
                     }
-                }                  
-                
-                if (remLength > 1) {
-                    for (let x = 0; x < remLength; x++) {
+
+                    if (remLength > 1) {
                         let nestCopy = [...charList]; // make copy so as not to mutate the original list
                         nestCopy.splice(x, 1); // remove one character
                         getNextChar(nestCopy, nestedSet[x]); // repeat with reduced character list to get next character
                     }
-                } 
-                else {
-                    finalOptionSet.push(nestedSet[0][0]);
+                    else {
+                        const potentialWord = nestedSet[0][0];
+                        // English words typically do not consist of only consonants
+                        if (!potentialWord.match(/\b[^aeiouy]+\b/g)) {
+                            finalOptionSet.push(potentialWord);
+                        }
+                    }
                 }
             };
 
@@ -139,6 +156,10 @@ const solveJumble = async () => {
 
     console.log('Solutions:');
     console.log(sortedWordList);
+
+    // const time2 = performance.now();
+    // const runTime = ((time2 - time1)/1000).toFixed(2);
+    // console.log(`Solved in ${runTime} seconds`);
 };
 
 

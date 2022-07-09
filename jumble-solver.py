@@ -1,5 +1,7 @@
 import math
 import enchant
+# import time
+import re
 
 # Check which tags are available to select a dictionary from enchant module:
 # print(enchant.list_languages())
@@ -37,12 +39,25 @@ def solveJumble():
     totalOptions = [] # a collection of unique character arrangements
     sortedWordList = {} # a dictionary that groups words together by character length in alphabetical order
 
+    # time1 = time.process_time()
+
     # set keys for sorted word list:
     for w in range(maxWordLength, 1, -1):
         sortedWordList[w] = []
+    
+    uniqueCharSets = []
 
     # recursive function to get all arrangements of a string and its substrings:
     def solveSubJumble(tupleChars):
+        charList = list(tupleChars)
+        charList.sort()
+        unique = "".join(charList)
+        # improve performance for jumbles with duplicate letters:
+        if unique not in uniqueCharSets:
+            uniqueCharSets.append(unique)
+        else:
+            return
+
         length = len(tupleChars)
 
         for i, c in enumerate(tupleChars):
@@ -67,18 +82,19 @@ def solveJumble():
                     nestedSet.append(opSet[start:end])
                     start += subOptions
                     end += subOptions
-                
-                for x in range(remLength):
+
                     for y in range(len(nestedSet[x])):
                         nestedSet[x][y] += charList[x]
                 
-                if remLength > 1: 
-                    for x in range(remLength):
+                    if remLength > 1:
                         nestCopy = list(charList) # make copy so as not to mutate the original list
                         nestCopy.pop(x) # remove one character
                         getNextChar(nestCopy, nestedSet[x], len(nestCopy)) # repeat with reduced character list to get next character
-                else:
-                    finalOptionSet.extend(nestedSet)
+                    else:
+                        rawExp = r"\b[^aeiouy]+\b"
+                        # English words typically do not consist of only consonants
+                        if not re.search(rawExp, nestedSet[0][0]):
+                            finalOptionSet.extend(nestedSet)
                 
             getNextChar(copy, optionSet, len(copy))
         
@@ -106,6 +122,10 @@ def solveJumble():
     
     print('Solutions:')
     print(sortedWordList)
+
+    # time2 = time.process_time()
+    # runTime = round(time2 - time1, 2)
+    # print(f'Solved in {runTime} seconds')
     
 
 solveJumble()
